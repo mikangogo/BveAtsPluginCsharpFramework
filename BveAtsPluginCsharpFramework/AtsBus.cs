@@ -207,7 +207,5 @@ namespace AtsPlugin
 
             return true;
         }
-
-
     }
 }

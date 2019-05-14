@@ -48,7 +48,6 @@ namespace AtsPlugin.MotorNoise
                     ImportMotorNoiseTable(Path.Combine(directoryName, motorNoiseTxt["Brake"].GetAsString("Volume")))
                     )
                 );
-
         }
 
         private static AtsTable ImportMotorNoiseTable(string path)

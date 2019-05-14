@@ -31,7 +31,6 @@ namespace AtsPlugin.MotorNoise
 
             PrimaryBufferDesc = new SoundBufferDescription
             {
-
                 Format = null,
                 Flags = BufferFlags.PrimaryBuffer,
                 SizeInBytes = 0,
@@ -44,15 +43,15 @@ namespace AtsPlugin.MotorNoise
 
         public static void Cleanup()
         {
-            // HACK: `Wasapi Out.Dispose()` calls Thread.Join() in itself.
+            // HACK: `DirectSound.Dispose()` calls Thread.Join() in itself.
             // Bve doesn't wait the running thread object when disposing the plug-in.
             // We have to block disposing forcibly.
-            var diposeThread = new System.Threading.Thread(DisposeThread);
-            diposeThread.Start();
+            var disposeThread = new System.Threading.Thread(DisposeThread);
+            disposeThread.Start();
 
-            while (diposeThread.ThreadState == System.Threading.ThreadState.Unstarted) ;
+            while (disposeThread.ThreadState == System.Threading.ThreadState.Unstarted) ;
 
-            while (diposeThread.ThreadState != System.Threading.ThreadState.Stopped)
+            while (disposeThread.ThreadState != System.Threading.ThreadState.Stopped)
             {
                 // Busy loop.
                 // Forcibly waiting.
@@ -89,7 +88,7 @@ namespace AtsPlugin.MotorNoise
         {
             private byte[] RawAudioStream { get; set; } = null;
             private SecondarySoundBuffer SecondaryBuffer { get; set; } = null;
-            private SoundBufferDescription SoundBufferDesc { get; set; }
+            private SoundBufferDescription SecondaryBufferDesc { get; set; }
 
             private int MinimumFrequency { get; set; } = 0;
             private int MaximumFrequency { get; set; } = 0;
@@ -114,6 +113,7 @@ namespace AtsPlugin.MotorNoise
                     SecondaryBuffer.Frequency = Math.Min(Math.Max((int)(DefaultFrequency * _pitch), MinimumFrequency), MaximumFrequency);
                 }
             }
+
             public float Volume
             {
                 get
@@ -176,8 +176,7 @@ namespace AtsPlugin.MotorNoise
             {
                 using (var AudioStream = new WaveStream(stream))
                 {
-
-                    SoundBufferDesc = new SoundBufferDescription
+                    SecondaryBufferDesc = new SoundBufferDescription
                     {
                         Format = AudioStream.Format,
                         Flags = BufferFlags.ControlVolume | BufferFlags.ControlFrequency | BufferFlags.ControlPan | BufferFlags.GetCurrentPosition2,
@@ -185,7 +184,7 @@ namespace AtsPlugin.MotorNoise
                     };
 
 
-                    RawAudioStream = new byte[SoundBufferDesc.SizeInBytes];
+                    RawAudioStream = new byte[SecondaryBufferDesc.SizeInBytes];
 
                     AudioStream.Read(RawAudioStream, 0, (int)AudioStream.Length);
                 }
@@ -198,7 +197,7 @@ namespace AtsPlugin.MotorNoise
                     throw new InvalidOperationException(string.Format("Already exists SoundBuffer."));
                 }
 
-                SecondaryBuffer = new SecondarySoundBuffer(device, SoundBufferDesc);
+                SecondaryBuffer = new SecondarySoundBuffer(device, SecondaryBufferDesc);
                 SecondaryBuffer.Write(RawAudioStream, 0, LockFlags.EntireBuffer);
                 SecondaryBuffer.CurrentPlayPosition = 0;
                 SecondaryBuffer.Volume = MinimumVolume;
@@ -206,7 +205,7 @@ namespace AtsPlugin.MotorNoise
                 MinimumFrequency = device.Capabilities.MinSecondarySampleRate;
                 MaximumFrequency = device.Capabilities.MaxSecondarySampleRate;
 
-                DefaultFrequency = SoundBufferDesc.Format.SamplesPerSecond;
+                DefaultFrequency = SecondaryBufferDesc.Format.SamplesPerSecond;
             }
 
             public void Dispose()
@@ -246,6 +245,7 @@ namespace AtsPlugin.MotorNoise
 
         public float Volume { get; set; } = 1.0f;
         public float Position { get; set; } = 0.0f;
+        public float LastPosition { get; private set; } = 0.0f;
 
         public AtsMotorNoise(ParameterTables positiveDirectionParameters, ParameterTables negativeDirectionParameters)
         {
@@ -267,20 +267,22 @@ namespace AtsPlugin.MotorNoise
 
         public void Update()
         {
-            var absoluteVehicleVelocity = AtsSimulationEnvironment.Instance.CurrentStates.AbsoluteVelocity;
-            var deltaVelocity = AtsSimulationEnvironment.Instance.CurrentStates.Velocity - AtsSimulationEnvironment.Instance.LastStates.Velocity;
+            var absolutePosition = Math.Abs(Position);
+            var differential = AtsSimulationEnvironment.Instance.CurrentStates.Velocity - AtsSimulationEnvironment.Instance.LastStates.Velocity;
 
 
-            var table = SelectParameterTable(deltaVelocity);
+            var table = SelectParameterTable(differential);
 
 
-            EvaluatePitch(absoluteVehicleVelocity, table);
-            EvaluateVolume(absoluteVehicleVelocity, table);
+            EvaluatePitch(absolutePosition, table);
+            EvaluateVolume(absolutePosition, table);
+
+            LastPosition = Position;
         }
 
-        private ParameterTables SelectParameterTable(float direction)
+        private ParameterTables SelectParameterTable(float differential)
         {
-            return (direction >= 0.0f) ? PositiveDirectionParameters : NegativeDirectionParameters;
+            return (differential >= 0.0f) ? PositiveDirectionParameters : NegativeDirectionParameters;
         }
 
         private void EvaluatePitch(float x, ParameterTables table)
@@ -313,16 +315,9 @@ namespace AtsPlugin.MotorNoise
                 {
                     continue;
                 }
+                
 
-
-                if (x == 0.0f)
-                {
-                    motorTrack.Audio.Volume = 0.0f;
-                    continue;
-                }
-
-
-                motorTrack.Audio.Volume = volume[x];
+                motorTrack.Audio.Volume = volume[x] * Volume;
             }
         }
     }

@@ -47,7 +47,7 @@ namespace AtsPlugin
             }
         }
 
-        private KeyState[] KeyStates { get => _keyStates; set => _keyStates = value; }
+        private KeyState[] KeyStates { get => _keyStates; }
 
         private KeyState[] _keyStates = Enumerable.Repeat<KeyState>(new KeyState(), Enum.GetNames(typeof(AtsKey)).Length).ToArray();
 
@@ -66,7 +66,7 @@ namespace AtsPlugin
             // Called from Run-Time function. Avoid Linq.
             for (var i = 0; i < KeyStates.Length; ++i)
             {
-                KeyStates[i].CopyFrom(source.KeyStates[i]);
+                _keyStates[i].CopyFrom(source._keyStates[i]);
             }
         }
     }

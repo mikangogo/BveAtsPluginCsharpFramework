@@ -70,7 +70,5 @@ namespace AtsPlugin.MotorNoise
                 .OrderBy(z => z.Key).ToArray()))
                 .ToArray();
         }
-
-
     }
 }
