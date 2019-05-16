@@ -49,12 +49,31 @@ namespace AtsPlugin.MotorNoise
             var disposeThread = new System.Threading.Thread(DisposeThread);
             disposeThread.Start();
 
-            while (disposeThread.ThreadState == System.Threading.ThreadState.Unstarted) ;
+
+            var beginTime = DateTime.Now.Millisecond;
+
+            while (disposeThread.ThreadState == System.Threading.ThreadState.Unstarted)
+            {
+                if ((DateTime.Now.Millisecond - beginTime) > 5000)
+                {
+                    // Timed out.
+                    break;
+                }
+            }
+
+
+            beginTime = DateTime.Now.Millisecond;
 
             while (disposeThread.ThreadState != System.Threading.ThreadState.Stopped)
             {
                 // Busy loop.
                 // Forcibly waiting.
+
+                if ((DateTime.Now.Millisecond - beginTime) > 5000)
+                {
+                    // Timed out.
+                    break;
+                }
             }
         }
 
@@ -96,81 +115,8 @@ namespace AtsPlugin.MotorNoise
             private int DefaultFrequency { get; set; } = 0;
             private readonly int MinimumVolume = -10000;
 
-            private float _pitch = 0.0f;
-            private float _volume = 0.0f;
-
-            public float Pitch
-            {
-                get
-                {
-                    return _pitch;
-                }
-                set
-                {
-                    _pitch = value;
-
-
-                    SecondaryBuffer.Frequency = Math.Min(Math.Max((int)(DefaultFrequency * _pitch), MinimumFrequency), MaximumFrequency);
-                }
-            }
-
-            public float Volume
-            {
-                get
-                {
-                    return _volume;
-                }
-                set
-                {
-                    _volume = value;
-
-
-                    var gain = MinimumVolume;
-
-
-                    if (_volume > 0.001f)
-                    {
-                        var attenuation = _volume;
-
-
-                        if (attenuation >= 1.0f)
-                        {
-                            attenuation = 1.0f;
-                        }
-
-
-                        gain = (int)(Math.Log10(1.0 / 1024.0 + attenuation / 1.0 * 1023.0 / 1024.0) * 2000.0);
-                    }
-
-
-                    SecondaryBuffer.Volume = gain;
-
-
-                    if (_volume > 0.0f)
-                    {
-                        if ((SecondaryBuffer.Status & BufferStatus.Playing) != 0)
-                        {
-                            return;
-                        }
-
-
-                        SecondaryBuffer.CurrentPlayPosition = 0;
-                        SecondaryBuffer.Play(0, PlayFlags.Looping);
-
-
-                        return;
-                    }
-
-
-                    if (SecondaryBuffer.Status == BufferStatus.None)
-                    {
-                        return;
-                    }
-
-
-                    SecondaryBuffer.Stop();
-                }
-            }
+            public float Pitch { set; get; }
+            public float Volume { set; get; }
 
             public MotorAudio(Stream stream)
             {
@@ -208,6 +154,59 @@ namespace AtsPlugin.MotorNoise
                 DefaultFrequency = SecondaryBufferDesc.Format.SamplesPerSecond;
             }
 
+            public void Update()
+            {
+                var pitch = Math.Max(Pitch, 0.0f);
+                var volume = Math.Max(Math.Min(Volume, 1.0f), 0.0f);
+
+                SecondaryBuffer.Frequency = Math.Min(Math.Max((int)(DefaultFrequency * pitch), MinimumFrequency), MaximumFrequency);
+
+                var gain = MinimumVolume;
+
+
+                if (volume > 0.001f)
+                {
+                    var attenuation = volume;
+
+
+                    if (attenuation >= 1.0f)
+                    {
+                        attenuation = 1.0f;
+                    }
+
+
+                    gain = (int)(Math.Log10(1.0 / 1024.0 + attenuation / 1.0 * 1023.0 / 1024.0) * 2000.0);
+                }
+
+
+                SecondaryBuffer.Volume = gain;
+
+
+                if (volume > 0.0f)
+                {
+                    if ((SecondaryBuffer.Status & BufferStatus.Playing) != 0)
+                    {
+                        return;
+                    }
+
+
+                    SecondaryBuffer.CurrentPlayPosition = 0;
+                    SecondaryBuffer.Play(0, PlayFlags.Looping);
+
+
+                    return;
+                }
+
+
+                if (SecondaryBuffer.Status == BufferStatus.None)
+                {
+                    return;
+                }
+
+
+                SecondaryBuffer.Stop();
+            }
+
             public void Dispose()
             {
                 SecondaryBuffer.Dispose();
@@ -233,11 +232,17 @@ namespace AtsPlugin.MotorNoise
                 Audio.SetupSoundBuffer(device);
             }
 
+            public void Update()
+            {
+                Audio.Update();
+            }
+
             public void Dispose()
             {
                 Audio.Dispose();
             }
         }
+
 
         public ParameterTables PositiveDirectionParameters { get; private set; } = null;
         public ParameterTables NegativeDirectionParameters { get; private set; } = null;
@@ -245,7 +250,7 @@ namespace AtsPlugin.MotorNoise
 
         public float Volume { get; set; } = 1.0f;
         public float Position { get; set; } = 0.0f;
-        public float LastPosition { get; private set; } = 0.0f;
+        public float DirectionMixtureRatio { get; set; } = 1.0f;
 
         public AtsMotorNoise(ParameterTables positiveDirectionParameters, ParameterTables negativeDirectionParameters)
         {
@@ -268,24 +273,22 @@ namespace AtsPlugin.MotorNoise
         public void Update()
         {
             var absolutePosition = Math.Abs(Position);
-            var differential = AtsSimulationEnvironment.Instance.CurrentStates.Velocity - AtsSimulationEnvironment.Instance.LastStates.Velocity;
+            var mixtureRatio = Math.Max(Math.Min(DirectionMixtureRatio, 1.0f), 0.0f);
 
 
-            var table = SelectParameterTable(differential);
+            MotorTracks.SetParameter(0.0f, 0.0f);
 
 
-            EvaluatePitch(absolutePosition, table);
-            EvaluateVolume(absolutePosition, table);
+            EvaluatePitch(absolutePosition, mixtureRatio, PositiveDirectionParameters);
+            EvaluateVolume(absolutePosition, mixtureRatio, PositiveDirectionParameters);
+            EvaluatePitch(absolutePosition, 1.0f - mixtureRatio, NegativeDirectionParameters);
+            EvaluateVolume(absolutePosition, 1.0f - mixtureRatio, NegativeDirectionParameters);
 
-            LastPosition = Position;
+
+            MotorTracks.Update();
         }
-
-        private ParameterTables SelectParameterTable(float differential)
-        {
-            return (differential >= 0.0f) ? PositiveDirectionParameters : NegativeDirectionParameters;
-        }
-
-        private void EvaluatePitch(float x, ParameterTables table)
+        
+        private void EvaluatePitch(float x, float mixtureRatio, ParameterTables table)
         {
             for (var i = 0; i < table.Pitch.Tracks.Length; ++i)
             {
@@ -299,11 +302,11 @@ namespace AtsPlugin.MotorNoise
                 }
 
 
-                motorTrack.Audio.Pitch = pitch[x];
+                motorTrack.Audio.Pitch += pitch[x] * mixtureRatio;
             }
         }
 
-        private void EvaluateVolume(float x, ParameterTables table)
+        private void EvaluateVolume(float x, float mixtureRatio, ParameterTables table)
         {
             for (var i = 0; i < table.Volume.Tracks.Length; ++i)
             {
@@ -317,7 +320,7 @@ namespace AtsPlugin.MotorNoise
                 }
                 
 
-                motorTrack.Audio.Volume = volume[x] * Volume;
+                motorTrack.Audio.Volume += (volume[x] * mixtureRatio) * Volume;
             }
         }
     }

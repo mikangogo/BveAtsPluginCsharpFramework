@@ -86,11 +86,10 @@ namespace AtsPlugin.MotorNoise
 
                 if (!File.Exists(filePath))
                 {
-                    AtsDebug.LogError(string.Format("{0}: The file does not exist: {1}, {2}", typeof(AtsMotorNoiseImporter).Name, index, filePath));
-                    return;
+                    throw new FileNotFoundException(string.Format("{0}: The file does not exist: {1}, {2}", typeof(AtsMotorNoiseImporter).Name, index, filePath));
                 }
 
-                var audio = new AtsMotorNoise.MotorAudio(new StreamReader(filePath).BaseStream);
+                var audio = new AtsMotorNoise.MotorAudio(new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)).BaseStream);
 
 
                 motorTrackList.Add(new AtsMotorNoise.MotorTrack(index, filePath, audio));
