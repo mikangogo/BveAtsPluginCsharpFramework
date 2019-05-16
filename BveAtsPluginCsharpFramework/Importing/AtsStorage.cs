@@ -14,7 +14,7 @@ namespace AtsPlugin.Importing
             var hasHeader = false;
             
 
-            using (var streamReader = new StreamReader(path))
+            using (var streamReader = new StreamReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
                 header = streamReader.ReadLine();
             }
@@ -37,7 +37,7 @@ namespace AtsPlugin.Importing
             }
 
 
-            using (var streamReader = new StreamReader(path, encoding))
+            using (var streamReader = new StreamReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), encoding))
             {
                 if (hasHeader)
                 {
