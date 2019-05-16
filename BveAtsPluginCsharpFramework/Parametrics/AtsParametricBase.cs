@@ -2,6 +2,10 @@
 {
     public abstract class AtsParametricBase
     {
+        public string Path { get; protected set; } = string.Empty;
+        public string FileName { get => System.IO.Path.GetFileName(Path); }
+
+
         public AtsParametricBase()
         {
         }
@@ -10,8 +14,5 @@
         {
             Path = path;
         }
-
-        public string Path { get; protected set; } = string.Empty;
-        public string FileName { get => System.IO.Path.GetFileName(Path); }
     }
 }

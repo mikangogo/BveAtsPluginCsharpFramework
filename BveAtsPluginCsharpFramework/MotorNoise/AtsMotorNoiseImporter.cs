@@ -32,7 +32,6 @@ namespace AtsPlugin.MotorNoise
             return LoadAsset(motorNoisePath, string.Empty, string.Empty);
         }
         
-
         private static AtsMotorNoise ImportMotorNoise(string path)
         {
             var directoryName = Path.GetDirectoryName(path);

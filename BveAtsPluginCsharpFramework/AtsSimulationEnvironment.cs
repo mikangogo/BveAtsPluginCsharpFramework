@@ -27,6 +27,7 @@ namespace AtsPlugin
         public AtsKeyStates LastKeyStates { get; private set; } = new AtsKeyStates();
         public AtsKeyStates CurrentKeyStates { get; private set; } = new AtsKeyStates();
 
+
         public double DeltaTime
         {
             get

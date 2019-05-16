@@ -6,6 +6,7 @@ namespace AtsPlugin
     {
         public int Priority;
 
+
         public AtsBehaviourPriority(int priority)
         {
             Priority = priority;

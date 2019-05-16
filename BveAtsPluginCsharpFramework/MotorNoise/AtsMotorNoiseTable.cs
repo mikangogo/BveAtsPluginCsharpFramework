@@ -11,6 +11,7 @@ namespace AtsPlugin.MotorNoise
         {
             public KeyValuePair<float, float>[] Pairs { get; private set; }
 
+
             public Track(KeyValuePair<float, float>[] pairs)
             {
                 Pairs = pairs;
@@ -57,10 +58,10 @@ namespace AtsPlugin.MotorNoise
             }
         }
 
-        public Track[] Tracks { get; private set; }
 
-        public Track this[int index] { get { return Tracks[index]; } }
-        public int Length { get { return Tracks.Length; } }
+        public Track[] Tracks { get; private set; }
+        public Track this[int index] { get => Tracks[index]; }
+        public int Length { get => Tracks.Length; }
 
 
         public AtsMotorNoiseTable(AtsTable table)

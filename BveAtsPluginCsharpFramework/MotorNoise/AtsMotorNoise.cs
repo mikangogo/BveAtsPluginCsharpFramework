@@ -247,10 +247,10 @@ namespace AtsPlugin.MotorNoise
         public ParameterTables PositiveDirectionParameters { get; private set; } = null;
         public ParameterTables NegativeDirectionParameters { get; private set; } = null;
         public MotorTrack[] MotorTracks { get; private set; } = null;
-
         public float Volume { get; set; } = 1.0f;
         public float Position { get; set; } = 0.0f;
         public float DirectionMixtureRatio { get; set; } = 1.0f;
+
 
         public AtsMotorNoise(ParameterTables positiveDirectionParameters, ParameterTables negativeDirectionParameters)
         {

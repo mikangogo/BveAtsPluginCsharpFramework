@@ -13,6 +13,9 @@ namespace AtsPlugin
             Close
         }
 
+        private AtsVehicleState _vehicleState;
+        private DoorStateType _doorState = DoorStateType.NotInitialized;
+
         public DoorStateType DoorState { get => _doorState; }
         public double Location { get => _vehicleState.Location; }
         public float Velocity { get => _vehicleState.Speed; }
@@ -25,8 +28,6 @@ namespace AtsPlugin
         public float SapPressure { get => _vehicleState.SapPressure; }
         public float MainCircuitCurrent { get => _vehicleState.Current; }
 
-        private AtsVehicleState _vehicleState;
-        private DoorStateType _doorState = DoorStateType.NotInitialized;
 
         internal void SetVehicleState(AtsVehicleState vehicleState)
         {

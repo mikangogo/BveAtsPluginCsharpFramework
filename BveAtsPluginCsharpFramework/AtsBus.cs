@@ -104,6 +104,7 @@ namespace AtsPlugin
             }
         }
 
+
         private Dictionary<string, ValueSet> ValueTable { get; set; } = new Dictionary<string, ValueSet>();
 
         public ValueSet this[string key]
@@ -119,6 +120,7 @@ namespace AtsPlugin
                 return ValueTable[key];
             }
         }
+
 
         public AtsBus()
         {

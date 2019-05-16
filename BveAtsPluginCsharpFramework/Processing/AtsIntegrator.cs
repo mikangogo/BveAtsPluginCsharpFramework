@@ -2,26 +2,26 @@
 {
     public class AtsIntegrator
     {
-        private double LastU { get; set; } = 0.0f;
-        private double LastY { get; set; } = 0.0f;
+        private double LastU { get; set; } = 0.0;
+        private double LastY { get; set; } = 0.0;
 
         public bool IsAbsolute { get; set; } = false;
+        public double U { get; set; } = 0.0;
+        public float UF { get => (float)U; set => U = value; }
+        public double Y { get; private set; } = 0.0;
+        public float YF { get => (float)Y; }
 
-        public float CalculateF(float u, float deltaTime)
+
+        public void Calculate(double deltaTime)
         {
-            return (float)Calculate(u, deltaTime);
-        }
+            var nextY = LastY + deltaTime * LastU;        // おいらー法
 
-        public double Calculate(double u, double deltaTime)
-        {
-            double nextY = LastY + deltaTime * LastU;        // おいらー法
-
-            nextY = (IsAbsolute) && (0.0f > nextY) ? 0.0f : nextY;
+            nextY = (IsAbsolute) && (0.0 > nextY) ? 0.0 : nextY;
 
             LastY = nextY;
-            LastU = u;
+            LastU = U;
 
-            return nextY;
+            Y = nextY;
         }
 	}
 }

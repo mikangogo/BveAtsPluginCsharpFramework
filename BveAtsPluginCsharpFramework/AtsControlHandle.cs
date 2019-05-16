@@ -2,8 +2,10 @@
 {
     public class AtsControlHandle
     {
-        public AtsHandles Handles { get; private set; }
         private AtsVehicleSpec Spec { get; set; }
+
+        public AtsHandles Handles { get; private set; }
+        
 
         public AtsControlHandle(AtsVehicleSpec vehicleSpec)
         {

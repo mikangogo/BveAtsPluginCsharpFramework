@@ -16,10 +16,11 @@ namespace AtsPlugin
                 Down,
             }
 
-            public StateType State { get => _state; }
-
             private StateType _state = StateType.Up;
 
+            public StateType State { get => _state; }
+
+            
             public bool IsDown
             {
                 get
@@ -48,7 +49,6 @@ namespace AtsPlugin
         }
 
         private KeyState[] KeyStates { get => _keyStates; }
-
         private KeyState[] _keyStates = Enumerable.Repeat<KeyState>(new KeyState(), Enum.GetNames(typeof(AtsKey)).Length).ToArray();
 
         public KeyState this[AtsKey keyType]
