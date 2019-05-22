@@ -149,18 +149,8 @@ namespace AtsPlugin
                 behaviour.OnControlHandleMoved(position, controlHandleType);
             }
 
-            switch (controlHandleType)
-            {
-                case ControlHandleType.Brake:
-                    ControlHandle.BrakePosition = position;
-                    break;
-                case ControlHandleType.Power:
-                    ControlHandle.TractionPosition = position;
-                    break;
-                case ControlHandleType.Reverser:
-                    ControlHandle.ReverserPosition = position;
-                    break;
-            }
+
+            ControlHandle.SetOrderedHandlePosition(position, controlHandleType);
         }
         
         internal void OnSignalChanged(int signalIndex)
@@ -187,6 +177,10 @@ namespace AtsPlugin
             LastStates.CopyFrom(CurrentStates);
             CurrentStates.SetVehicleState(vehicleState);
             
+
+            ControlHandle.Update();
+
+
             foreach (IAtsBehaviour behaviour in Behaviours)
             {
                 behaviour.Update();
@@ -194,7 +188,7 @@ namespace AtsPlugin
 
             LastKeyStates.CopyFrom(CurrentKeyStates);
 
-            vehicleOperations = ControlHandle.Handles;
+            vehicleOperations = ControlHandle.Operation;
         }
     }
 }

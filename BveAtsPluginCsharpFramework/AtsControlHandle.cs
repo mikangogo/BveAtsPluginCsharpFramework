@@ -4,7 +4,8 @@
     {
         private AtsVehicleSpec Spec { get; set; }
 
-        public AtsHandles Handles { get; private set; }
+        public AtsHandles Ordered { get; private set; }
+        public AtsHandles Operation { get; private set; }
         
 
         public AtsControlHandle(AtsVehicleSpec vehicleSpec)
@@ -12,18 +13,69 @@
             Spec = vehicleSpec;
         }
 
+        public void Update()
+        {
+            Operation = Ordered;
+        }
+
+        public void SetOrderedHandlePosition(int position, AtsSimulationEnvironment.ControlHandleType controlHandleType)
+        {
+            var orderedHandles = Ordered;
+
+
+            switch (controlHandleType)
+            {
+                case AtsSimulationEnvironment.ControlHandleType.Brake:
+                    orderedHandles.Brake = position;
+                    break;
+                case AtsSimulationEnvironment.ControlHandleType.Power:
+                    orderedHandles.Power = position;
+                    break;
+                case AtsSimulationEnvironment.ControlHandleType.Reverser:
+                    orderedHandles.Reverser = position;
+                    break;
+            }
+
+
+            Ordered = orderedHandles;
+        }
+
+        public int OrderedTractionPosition
+        {
+            get
+            {
+                return Ordered.Power;
+            }
+        }
+
+        public int OrderedBrakePosition
+        {
+            get
+            {
+                return Ordered.Brake;
+            }
+        }
+
+        public int OrderedReverserPosition
+        {
+            get
+            {
+                return Ordered.Reverser;
+            }
+        }
+
         public int TractionPosition
         {
             get
             {
-                return Handles.Power;
+                return Operation.Power;
             }
 
             set
             {
-                var changed = Handles;
+                var changed = Operation;
                 changed.Power = value;
-                Handles = changed;
+                Operation = changed;
             }
         }
 
@@ -31,14 +83,14 @@
         {
             get
             {
-                return Handles.Brake;
+                return Operation.Brake;
             }
 
             set
             {
-                var changed = Handles;
+                var changed = Operation;
                 changed.Brake = value;
-                Handles = changed;
+                Operation = changed;
             }
         }
 
@@ -46,14 +98,14 @@
         {
             get
             {
-                return Handles.Reverser;
+                return Operation.Reverser;
             }
 
             set
             {
-                var changed = Handles;
+                var changed = Operation;
                 changed.Reverser = value;
-                Handles = changed;
+                Operation = changed;
             }
         }
 
@@ -101,7 +153,7 @@
         {
             get
             {
-                return (BrakePosition > 0) && (Handles.Brake <= EmergencyServiceBrake);
+                return (BrakePosition > 0) && (Operation.Brake <= EmergencyServiceBrake);
             }
         }
 
