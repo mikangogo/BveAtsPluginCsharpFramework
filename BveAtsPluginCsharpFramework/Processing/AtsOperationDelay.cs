@@ -24,6 +24,7 @@ namespace AtsPlugin.Processing
 
         public void Reset(double initial)
         {
+            Integrator.Reset(initial, 0.0);
             LastU = initial;
         }
 

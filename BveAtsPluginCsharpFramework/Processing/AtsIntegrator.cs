@@ -12,9 +12,20 @@
         public float YF { get => (float)Y; }
 
 
+        public AtsIntegrator(double initialY = 0.0, double initialLastU = 0.0)
+        {
+            Reset(initialY, initialLastU);
+        }
+
+        public void Reset(double initialY, double initialLastU)
+        {
+            LastY = initialY;
+            LastU = initialLastU;
+        }
+
         public void Calculate(double deltaTime)
         {
-            var nextY = LastY + deltaTime * LastU;        // おいらー法
+            var nextY = LastY + deltaTime * LastU;
 
             nextY = (IsAbsolute) && (0.0 > nextY) ? 0.0 : nextY;
 
