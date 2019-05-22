@@ -84,6 +84,9 @@
     <Compile Include="Parametrics\AtsIni.cs" />
     <Compile Include="Parametrics\AtsParametricBase.cs" />
     <Compile Include="Parametrics\AtsTable.cs" />
+    <Compile Include="Processing\AtsIntegrator.cs" />
+    <Compile Include="Processing\AtsOperationDelay.cs" />
+    <Compile Include="Processing\AtsOperationRationalDelay.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
