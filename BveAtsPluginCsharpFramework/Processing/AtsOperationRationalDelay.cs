@@ -14,6 +14,8 @@ namespace AtsPlugin.Processing
         public float YF { get => (float)Y; }
         public double Tp { get; set; } = 1000.0;
         public float TpF { get => (float)Tp; set => Tp = value; }
+        public double DeltaY { get; set; } = 1.0;
+        public float DeltaYF { get => (float)DeltaY; set => DeltaY = value;}
 
 
         public AtsOperationRationalDelay(double initial = 0.0)
@@ -29,7 +31,7 @@ namespace AtsPlugin.Processing
 
         public void Calculate(double deltaTime)
         {
-            var delta = U * (deltaTime / Tp);
+            var delta = DeltaY * (deltaTime / Tp);
             var diff = U - Y;
 
 
