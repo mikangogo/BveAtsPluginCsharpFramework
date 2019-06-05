@@ -120,19 +120,19 @@ namespace AtsPlugin.MotorNoise
 
             public MotorAudio(Stream stream)
             {
-                using (var AudioStream = new WaveStream(stream))
+                using (var audioStream = new WaveStream(stream))
                 {
                     SecondaryBufferDesc = new SoundBufferDescription
                     {
-                        Format = AudioStream.Format,
+                        Format = audioStream.Format,
                         Flags = BufferFlags.ControlVolume | BufferFlags.ControlFrequency | BufferFlags.ControlPan | BufferFlags.GetCurrentPosition2,
-                        SizeInBytes = (int)AudioStream.Length
+                        SizeInBytes = (int)audioStream.Length
                     };
 
 
                     RawAudioStream = new byte[SecondaryBufferDesc.SizeInBytes];
 
-                    AudioStream.Read(RawAudioStream, 0, (int)AudioStream.Length);
+                    audioStream.Read(RawAudioStream, 0, (int)audioStream.Length);
                 }
             }
             
@@ -140,7 +140,7 @@ namespace AtsPlugin.MotorNoise
             {
                 if (SecondaryBuffer != null)
                 {
-                    throw new InvalidOperationException(string.Format("Already exists SoundBuffer."));
+                    throw new InvalidOperationException("Already exists SoundBuffer.");
                 }
 
                 SecondaryBuffer = new SecondarySoundBuffer(device, SecondaryBufferDesc);

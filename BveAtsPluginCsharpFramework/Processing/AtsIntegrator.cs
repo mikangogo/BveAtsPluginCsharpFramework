@@ -9,7 +9,7 @@
         public double U { get; set; } = 0.0;
         public float UF { get => (float)U; set => U = value; }
         public double Y { get; private set; } = 0.0;
-        public float YF { get => (float)Y; }
+        public float YF => (float)Y;
 
 
         public AtsIntegrator(double initialY = 0.0, double initialLastU = 0.0)

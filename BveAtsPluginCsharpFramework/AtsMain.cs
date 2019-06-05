@@ -142,7 +142,7 @@ namespace AtsPlugin
         [DllExport(CallingConvention.StdCall)]
         private static void Load()
         {
-            AtsDebug.LogInfo(string.Format("Called: {0}()", nameof(Load)));
+            AtsDebug.LogInfo($"Called: {nameof(Load)}()");
 
 
             AtsSimulationEnvironment.Instance.OnLoad();
@@ -154,7 +154,7 @@ namespace AtsPlugin
         [DllExport(CallingConvention.StdCall)]
         private static void Dispose()
         {
-            AtsDebug.LogInfo(string.Format("Called: {0}()", nameof(Dispose)));
+            AtsDebug.LogInfo($"Called: {nameof(Dispose)}()");
 
 
             AtsSimulationEnvironment.Instance.OnDispose();
@@ -177,7 +177,7 @@ namespace AtsPlugin
         [DllExport(CallingConvention.StdCall)]
         private static void SetVehicleSpec(AtsVehicleSpec vehicleSpec)
         {
-            AtsDebug.LogInfo(string.Format("Called: {0}()", nameof(SetVehicleSpec)));
+            AtsDebug.LogInfo($"Called: {nameof(SetVehicleSpec)}()");
 
 
             AtsSimulationEnvironment.Instance.OnVehicleSpecPresented(vehicleSpec);
@@ -190,7 +190,7 @@ namespace AtsPlugin
         [DllExport(CallingConvention.StdCall)]
         private static void Initialize(int initialHandlePosition)
         {
-            AtsDebug.LogInfo(string.Format("Called: {0}()", nameof(Initialize)));
+            AtsDebug.LogInfo($"Called: {nameof(Initialize)}()");
 
 
             AtsSimulationEnvironment.Instance.OnInitialize(initialHandlePosition);
@@ -206,10 +206,7 @@ namespace AtsPlugin
         [DllExport(CallingConvention.StdCall)]
         private static AtsHandles Elapse(AtsVehicleState vehicleState, IntPtr panel, IntPtr sound)
         {
-            AtsHandles vehicleOperations;
-
-
-            AtsSimulationEnvironment.Instance.OnUpdate(out vehicleOperations, vehicleState, panel, sound);
+            AtsSimulationEnvironment.Instance.OnUpdate(out var vehicleOperations, vehicleState, panel, sound);
 
 
             return vehicleOperations;
@@ -222,7 +219,7 @@ namespace AtsPlugin
         [DllExport(CallingConvention.StdCall)]
         private static void SetPower(int handlePosition)
         {
-            AtsDebug.LogInfo(string.Format("Called: {0}()", nameof(SetPower)));
+            AtsDebug.LogInfo($"Called: {nameof(SetPower)}()");
 
 
             AtsSimulationEnvironment.Instance.OnControlHandleMoved(handlePosition, AtsSimulationEnvironment.ControlHandleType.Power);
@@ -235,7 +232,7 @@ namespace AtsPlugin
         [DllExport(CallingConvention.StdCall)]
         private static void SetBrake(int handlePosition)
         {
-            AtsDebug.LogInfo(string.Format("Called: {0}()", nameof(SetBrake)));
+            AtsDebug.LogInfo($"Called: {nameof(SetBrake)}()");
 
 
             AtsSimulationEnvironment.Instance.OnControlHandleMoved(handlePosition, AtsSimulationEnvironment.ControlHandleType.Brake);
@@ -248,7 +245,7 @@ namespace AtsPlugin
         [DllExport(CallingConvention.StdCall)]
         private static void SetReverser(int handlePosition)
         {
-            AtsDebug.LogInfo(string.Format("Called: {0}()", nameof(SetReverser)));
+            AtsDebug.LogInfo($"Called: {nameof(SetReverser)}()");
 
 
             AtsSimulationEnvironment.Instance.OnControlHandleMoved(handlePosition, AtsSimulationEnvironment.ControlHandleType.Reverser);
@@ -290,7 +287,7 @@ namespace AtsPlugin
         [DllExport(CallingConvention.StdCall)]
         private static void DoorOpen()
         {
-            AtsDebug.LogInfo(string.Format("Called: {0}()", nameof(DoorOpen)));
+            AtsDebug.LogInfo($"Called: {nameof(DoorOpen)}()");
 
 
             AtsSimulationEnvironment.Instance.OnDoorStateChanged(false);
@@ -302,7 +299,7 @@ namespace AtsPlugin
         [DllExport(CallingConvention.StdCall)]
         private static void DoorClose()
         {
-            AtsDebug.LogInfo(string.Format("Called: {0}()", nameof(DoorClose)));
+            AtsDebug.LogInfo($"Called: {nameof(DoorClose)}()");
 
 
             AtsSimulationEnvironment.Instance.OnDoorStateChanged(true);
@@ -315,7 +312,7 @@ namespace AtsPlugin
         [DllExport(CallingConvention.StdCall)]
         private static void SetSignal(int signalIndex)
         {
-            AtsDebug.LogInfo(string.Format("Called: {0}()", nameof(SetSignal)));
+            AtsDebug.LogInfo($"Called: {nameof(SetSignal)}()");
 
 
             AtsSimulationEnvironment.Instance.OnSignalChanged(signalIndex);
@@ -328,7 +325,7 @@ namespace AtsPlugin
         [DllExport(CallingConvention.StdCall)]
         private static void SetBeaconData(AtsBeaconData beaconData)
         {
-            AtsDebug.LogInfo(string.Format("Called: {0}()", nameof(SetBeaconData)));
+            AtsDebug.LogInfo($"Called: {nameof(SetBeaconData)}()");
 
 
             AtsSimulationEnvironment.Instance.OnBeaconDataRecieved(beaconData);

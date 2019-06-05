@@ -12,7 +12,7 @@ namespace AtsPlugin.Processing
         public double U { get; set; } = 0.0;
         public float UF { get => (float)U; set => U = value; }
         public double Y { get; private set; } = 0.0;
-        public float YF { get => (float)Y; }
+        public float YF => (float)Y;
         public double Tp { get; set; } = 1000.0;
         public float TpF { get => (float)Tp; set => Tp = value; }
 

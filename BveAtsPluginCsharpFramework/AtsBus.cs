@@ -16,13 +16,9 @@ namespace AtsPlugin
         {
             public ValueData Value { get; set; } = new ValueData();
             public ValueData DefaultValue { get; set; } = new ValueData();
-
             public bool AsBoolean
             {
-                get
-                {
-                    return Value.BoolValue;
-                }
+                get => Value.BoolValue;
 
                 set
                 {
@@ -31,13 +27,9 @@ namespace AtsPlugin
                     Value = changedValue;
                 }
             }
-
             public int AsInt32
             {
-                get
-                {
-                    return Value.Int32Value;
-                }
+                get => Value.Int32Value;
 
                 set
                 {
@@ -46,13 +38,9 @@ namespace AtsPlugin
                     Value = changedValue;
                 }
             }
-
             public double AsFp64
             {
-                get
-                {
-                    return Value.Fp64Value;
-                }
+                get => Value.Fp64Value;
 
                 set
                 {
@@ -61,13 +49,9 @@ namespace AtsPlugin
                     Value = changedValue;
                 }
             }
-
             public float AsFp32
             {
-                get
-                {
-                    return (float)Value.Fp64Value;
-                }
+                get => (float)Value.Fp64Value;
 
                 set
                 {
@@ -76,13 +60,9 @@ namespace AtsPlugin
                     Value = changedValue;
                 }
             }
-
             public string AsString
             {
-                get
-                {
-                    return Value.StringValue;
-                }
+                get => Value.StringValue;
 
                 set
                 {
@@ -113,7 +93,8 @@ namespace AtsPlugin
             {
                 if (!ValueTable.ContainsKey(key))
                 {
-                    throw new KeyNotFoundException(string.Format("{0}: The key does not exist: {0}", typeof(AtsBus).Name, key));
+                    throw new KeyNotFoundException(message:
+                        $"{typeof(AtsBus).Name}: The key does not exist: {typeof(AtsBus).Name}");
                 }
 
                 

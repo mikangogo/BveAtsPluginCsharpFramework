@@ -8,9 +8,9 @@ namespace AtsPlugin.Parametrics
         public class Track
         {
             public KeyValuePair<string, string>[] Pairs { get; set; } = Enumerable.Empty< KeyValuePair<string, string>>().ToArray();
-            public KeyValuePair<string, string> this[int index] { get => Pairs[index]; }
+            public KeyValuePair<string, string> this[int index] => Pairs[index];
             public string this[string key] { get => Pairs.Single(e => e.Key == key).Value; }
-            public int Length { get => Pairs.Length; }
+            public int Length => Pairs.Length;
 
 
             public Track(KeyValuePair<string, string>[] pairs)

@@ -40,36 +40,12 @@
             Ordered = orderedHandles;
         }
 
-        public int OrderedTractionPosition
-        {
-            get
-            {
-                return Ordered.Power;
-            }
-        }
-
-        public int OrderedBrakePosition
-        {
-            get
-            {
-                return Ordered.Brake;
-            }
-        }
-
-        public int OrderedReverserPosition
-        {
-            get
-            {
-                return Ordered.Reverser;
-            }
-        }
-
+        public int OrderedTractionPosition => Ordered.Power;
+        public int OrderedBrakePosition => Ordered.Brake;
+        public int OrderedReverserPosition => Ordered.Reverser;
         public int TractionPosition
         {
-            get
-            {
-                return Operation.Power;
-            }
+            get => Operation.Power;
 
             set
             {
@@ -78,13 +54,9 @@
                 Operation = changed;
             }
         }
-
         public int BrakePosition
         {
-            get
-            {
-                return Operation.Brake;
-            }
+            get => Operation.Brake;
 
             set
             {
@@ -93,13 +65,9 @@
                 Operation = changed;
             }
         }
-
         public int ReverserPosition
         {
-            get
-            {
-                return Operation.Reverser;
-            }
+            get => Operation.Reverser;
 
             set
             {
@@ -108,101 +76,18 @@
                 Operation = changed;
             }
         }
-
-        public int EmergencyBrake
-        {
-            get
-            {
-                return EmergencyServiceBrake + 1;
-            }
-        }
-
-        public int EmergencyServiceBrake
-        {
-            get
-            {
-                return Spec.BrakeNotches;
-            }
-        }
-
-        public int MaximumServiceBrake
-        {
-            get
-            {
-                return Spec.B67Notch;
-            }
-        }
-
-        public int ServiceBrakeCanConfirmAts
-        {
-            get
-            {
-                return Spec.AtsNotch;
-            }
-        }
-
-        public bool IsAppliedBrake
-        {
-            get
-            {
-                return (BrakePosition > 0);
-            }
-        }
-
-        public bool IsAppliedServiceBrake
-        {
-            get
-            {
-                return (BrakePosition > 0) && (Operation.Brake <= EmergencyServiceBrake);
-            }
-        }
-
-        public bool IsAppliedEmergencyServiceBrake
-        {
-            get
-            {
-                return (BrakePosition == EmergencyServiceBrake);
-            }
-        }
-
-        public bool IsAppliedEmergencyBrake
-        {
-            get
-            {
-                return (BrakePosition == EmergencyBrake);
-            }
-        }
-
-        public bool IsAppliedTraction
-        {
-            get
-            {
-                return (TractionPosition > 0);
-            }
-        }
-
-        public bool IsPlacedOnReverserNeutral
-        {
-            get
-            {
-                return (ReverserPosition == 0);
-            }
-        }
-
-        public bool IsPlacedOnReverserFront
-        {
-            get
-            {
-                return (ReverserPosition > 0);
-            }
-        }
-
-        public bool IsPlacedOnReverserBack
-        {
-            get
-            {
-                return (ReverserPosition < 0);
-            }
-        }
+        public int MaximumTractionPosition => Spec.PowerNotches;
+        public int EmergencyBrake => EmergencyServiceBrake + 1;
+        public int EmergencyServiceBrake => Spec.BrakeNotches;
+        public int MaximumServiceBrake => Spec.B67Notch;
+        public int ServiceBrakeCanConfirmAts => Spec.AtsNotch;
+        public bool IsAppliedBrake => (BrakePosition > 0);
+        public bool IsAppliedServiceBrake => (BrakePosition > 0) && (Operation.Brake <= EmergencyServiceBrake);
+        public bool IsAppliedEmergencyServiceBrake => (BrakePosition == EmergencyServiceBrake);
+        public bool IsAppliedEmergencyBrake => (BrakePosition == EmergencyBrake);
+        public bool IsAppliedTraction => (TractionPosition > 0);
+        public bool IsPlacedOnReverserNeutral => (ReverserPosition == 0);
+        public bool IsPlacedOnReverserFront => (ReverserPosition > 0);
+        public bool IsPlacedOnReverserBack => (ReverserPosition < 0);
     }
 }

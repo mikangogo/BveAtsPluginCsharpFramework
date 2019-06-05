@@ -19,7 +19,7 @@ namespace AtsPlugin.Parametrics
 
                     if (!PairDictionary.ContainsKey(key))
                     {
-                        throw new KeyNotFoundException(string.Format("{0}: The key '{2}' does not exist in section '[{1}]'.", FileName, Name, key));
+                        throw new KeyNotFoundException(message: string.Format("{0}: The key '{2}' does not exist in section '[{1}]'.", FileName, Name, key));
                     }
 
                     
@@ -67,7 +67,7 @@ namespace AtsPlugin.Parametrics
 
                 if (!SectionDictionary.ContainsKey(sectionName))
                 {
-                    throw new KeyNotFoundException(string.Format("{0}: The section '[{1}]' does not exist.", FileName, sectionName));
+                    throw new KeyNotFoundException($"{FileName}: The section '[{sectionName}]' does not exist.");
                 }
 
                 return SectionDictionary[sectionName];

@@ -12,7 +12,8 @@ namespace AtsPlugin.MotorNoise
         {
             if (!File.Exists(motorNoisePath))
             {
-                throw new FileNotFoundException(string.Format("{0}: The file does not exist: {0}",  typeof(AtsMotorNoiseImporter).Name, motorNoisePath));
+                throw new FileNotFoundException(
+                    $"{typeof(AtsMotorNoiseImporter).Name}: The file does not exist: {typeof(AtsMotorNoiseImporter).Name}");
             }
 
             var motorNoise = ImportMotorNoise(motorNoisePath);
@@ -35,7 +36,7 @@ namespace AtsPlugin.MotorNoise
         private static AtsMotorNoise ImportMotorNoise(string path)
         {
             var directoryName = Path.GetDirectoryName(path);
-            var motorNoiseTxt = AtsParser.ParseIni(path, a => AtsStorage.ReadText(a));
+            var motorNoiseTxt = AtsParser.ParseIni(path, AtsStorage.ReadText);
 
             return new AtsMotorNoise(
                 new AtsMotorNoise.ParameterTables(
@@ -63,13 +64,13 @@ namespace AtsPlugin.MotorNoise
             }
 
 
-            return AtsParser.ParseTable(path, a => AtsStorage.ReadText(a));
+            return AtsParser.ParseTable(path, AtsStorage.ReadText);
         }
 
         private static void ImportSound(AtsMotorNoise motorNoise, string path, string sectionName)
         {
             var directoryName = Path.GetDirectoryName(path);
-            var soundTxt = AtsParser.ParseIni(path, a => AtsStorage.ReadText(a));
+            var soundTxt = AtsParser.ParseIni(path, AtsStorage.ReadText);
 
             var keyValuePairs = soundTxt[sectionName].GetPairArray();
 

@@ -46,10 +46,7 @@ namespace AtsPlugin
         
         public void Add(string key)
         {
-            var desireIndex = -1;
-
-
-            if (!FindFreeElementIndex(out desireIndex))
+            if (!FindFreeElementIndex(out var desireIndex))
             {
                 return;
             }

@@ -46,7 +46,7 @@ namespace AtsPlugin
             }
 
 
-            Debug.WriteLine(string.Format("[{0}]{1}: {2}", AtsModule.ModuleName, logLevelString, message));
+            Debug.WriteLine($"[{AtsModule.ModuleName}]{logLevelString}: {message}");
         }
 
         public static void LogVerbose(string message)

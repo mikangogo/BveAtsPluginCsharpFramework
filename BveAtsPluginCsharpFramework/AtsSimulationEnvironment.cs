@@ -14,10 +14,12 @@ namespace AtsPlugin
             Reverser
         }
 
-        public readonly int LowestPriorty = 1000000;
+
+        private IAtsBehaviour[] Behaviours { get; set; } = null;
 
         public static AtsSimulationEnvironment Instance { get; } = new AtsSimulationEnvironment();
 
+        public readonly int LowestPriority = 1000000;
         public AtsBus Bus { get; private set; } = new AtsBus();
         public AtsNamedIoArray PanelOperations { get; private set; } = new AtsNamedIoArray();
         public AtsNamedIoArray SoundOperations { get; private set; } = new AtsNamedIoArray();
@@ -26,25 +28,10 @@ namespace AtsPlugin
         public AtsSimulationStates CurrentStates { get; private set; } = new AtsSimulationStates();
         public AtsKeyStates LastKeyStates { get; private set; } = new AtsKeyStates();
         public AtsKeyStates CurrentKeyStates { get; private set; } = new AtsKeyStates();
+        public double DeltaTime => Math.Max(1.0, CurrentStates.SimulationTime - LastStates.SimulationTime);
+        public float DeltaTimeF => (float)DeltaTime;
 
-
-        public double DeltaTime
-        {
-            get
-            {
-                return Math.Max(1.0, CurrentStates.SimulationTime - LastStates.SimulationTime);
-            }
-        }
-
-        public float DeltaTimeF
-        {
-            get
-            {
-                return (float)DeltaTime;
-            }
-        }
-
-        private IAtsBehaviour[] Behaviours { get; set; } = null;
+        
 
         private AtsSimulationEnvironment()
         {
@@ -62,10 +49,10 @@ namespace AtsPlugin
                 behaviourList.Add((IAtsBehaviour)Activator.CreateInstance(type));
             }
 
-            Behaviours = behaviourList.OrderBy(element => (Attribute.GetCustomAttribute(element.GetType(), typeof(AtsBehaviourPriority)) as AtsBehaviourPriority)?.Priority ?? LowestPriorty).ToArray();
+            Behaviours = behaviourList.OrderBy(element => (Attribute.GetCustomAttribute(element.GetType(), typeof(AtsBehaviourPriority)) as AtsBehaviourPriority)?.Priority ?? LowestPriority).ToArray();
 
 
-            foreach (IAtsBehaviour behaviour in Behaviours)
+            foreach (var behaviour in Behaviours)
             {
                 behaviour.Awake(this);
             }
@@ -73,7 +60,7 @@ namespace AtsPlugin
 
         internal void OnDispose()
         {
-            foreach (IAtsBehaviour behaviour in Behaviours)
+            foreach (var behaviour in Behaviours)
             {
                 behaviour.OnDestroy();
             }
@@ -85,7 +72,7 @@ namespace AtsPlugin
         {
             ControlHandle = new AtsControlHandle(vehicleSpec);
 
-            foreach (IAtsBehaviour behaviour in Behaviours)
+            foreach (var behaviour in Behaviours)
             {
                 behaviour.OnActivate();
             }
@@ -95,7 +82,7 @@ namespace AtsPlugin
         {
             var convertedArgument = (AtsInitialHandlePosition)Enum.ToObject(typeof(AtsInitialHandlePosition), initialHandlePosition);
 
-            foreach (IAtsBehaviour behaviour in Behaviours)
+            foreach (var behaviour in Behaviours)
             {
                 behaviour.OnStart(convertedArgument);
             }
@@ -112,7 +99,7 @@ namespace AtsPlugin
                 CurrentStates.SetDoorState(AtsSimulationStates.DoorStateType.Open);
             }
             
-            foreach (IAtsBehaviour behaviour in Behaviours)
+            foreach (var behaviour in Behaviours)
             {
                 behaviour.OnDoorStateChanged(CurrentStates.DoorState);
             }
@@ -136,7 +123,7 @@ namespace AtsPlugin
         {
             var convertedArgument = (AtsHornType)Enum.ToObject(typeof(AtsHornType), hornIndex);
 
-            foreach (IAtsBehaviour behaviour in Behaviours)
+            foreach (var behaviour in Behaviours)
             {
                 behaviour.OnHornBlew(convertedArgument);
             }
@@ -144,7 +131,7 @@ namespace AtsPlugin
 
         internal void OnControlHandleMoved(int position, ControlHandleType controlHandleType)
         {
-            foreach (IAtsBehaviour behaviour in Behaviours)
+            foreach (var behaviour in Behaviours)
             {
                 behaviour.OnControlHandleMoved(position, controlHandleType);
             }
@@ -155,7 +142,7 @@ namespace AtsPlugin
         
         internal void OnSignalChanged(int signalIndex)
         {
-            foreach (IAtsBehaviour behaviour in Behaviours)
+            foreach (var behaviour in Behaviours)
             {
                 behaviour.OnSignalChanged(signalIndex);
             }
@@ -163,7 +150,7 @@ namespace AtsPlugin
 
         internal void OnBeaconDataRecieved(AtsBeaconData beaconData)
         {
-            foreach (IAtsBehaviour behaviour in Behaviours)
+            foreach (var behaviour in Behaviours)
             {
                 behaviour.OnBeaconDataRecieved(beaconData);
             }
@@ -181,7 +168,7 @@ namespace AtsPlugin
             ControlHandle.Update();
 
 
-            foreach (IAtsBehaviour behaviour in Behaviours)
+            foreach (var behaviour in Behaviours)
             {
                 behaviour.Update();
             }

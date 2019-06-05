@@ -61,7 +61,7 @@ namespace AtsPlugin.MotorNoise
 
         public Track[] Tracks { get; private set; }
         public Track this[int index] { get => Tracks[index]; }
-        public int Length { get => Tracks.Length; }
+        public int Length => Tracks.Length;
 
 
         public AtsMotorNoiseTable(AtsTable table)

@@ -6,11 +6,11 @@
         public string FileName { get => System.IO.Path.GetFileName(Path); }
 
 
-        public AtsParametricBase()
+        protected AtsParametricBase()
         {
         }
 
-        public AtsParametricBase(string path)
+        protected AtsParametricBase(string path)
         {
             Path = path;
         }
