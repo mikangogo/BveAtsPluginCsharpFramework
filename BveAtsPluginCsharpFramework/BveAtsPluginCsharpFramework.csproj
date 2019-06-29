@@ -78,6 +78,7 @@
     <Compile Include="Importing\AtsTableParser.cs" />
     <Compile Include="MotorNoise\AtsMotorNoise.cs" />
     <Compile Include="MotorNoise\AtsMotorNoiseImporter.cs" />
+    <Compile Include="MotorNoise\AtsMotorNoiseMotorTrackExtensions.cs" />
     <Compile Include="MotorNoise\AtsMotorNoiseTable.cs" />
     <Compile Include="MotorNoise\MotorTrackExtensions.cs" />
     <Compile Include="MyBehaviour.cs" />
