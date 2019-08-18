@@ -8,6 +8,19 @@ namespace AtsPlugin.Importing
     {
         public static string ReadText(string path)
         {
+            if (!Path.IsPathRooted(path))
+            {
+                path = Path.Combine(AtsModule.ModuleDirectoryPath, path);
+            }
+
+            if (!File.Exists(path))
+            {
+                throw new FileNotFoundException($"{typeof(AtsStorage).Name}: The file does not exist: {path}");
+            }
+
+            AtsDebug.LogInfo($"{nameof(AtsStorage)}: ReadText: Load: {path}");
+
+
             var header = string.Empty;
             var body = string.Empty;
             var encoding = Encoding.UTF8;

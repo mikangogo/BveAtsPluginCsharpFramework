@@ -328,7 +328,7 @@ namespace AtsPlugin
             AtsDebug.LogInfo($"Called: {nameof(SetBeaconData)}()");
 
 
-            AtsSimulationEnvironment.Instance.OnBeaconDataRecieved(beaconData);
+            AtsSimulationEnvironment.Instance.OnBeaconDataReceived(beaconData);
         }
     }
 }

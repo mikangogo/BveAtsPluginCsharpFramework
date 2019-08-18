@@ -20,6 +20,8 @@ namespace AtsPlugin
         public double Location => _vehicleState.Location;
         public float Velocity => _vehicleState.Speed;
         public float AbsoluteVelocity => Math.Abs(_vehicleState.Speed);
+        public float VelocityFromDeltaLocation { get; private set; }
+        public float AbsoluteVelocityFromDeltaLocation => Math.Abs(VelocityFromDeltaLocation);
         public int SimulationTime => _vehicleState.Time;
         public float BcPressure => _vehicleState.BcPressure;
         public float MrPressure => _vehicleState.MrPressure;
@@ -37,6 +39,11 @@ namespace AtsPlugin
         internal void SetDoorState(DoorStateType doorState)
         {
             _doorState = doorState;
+        }
+
+        internal void SetVelocityFromDeltaLocation(float velocity)
+        {
+            VelocityFromDeltaLocation = velocity;
         }
 
         internal void CopyFrom(AtsSimulationStates source)

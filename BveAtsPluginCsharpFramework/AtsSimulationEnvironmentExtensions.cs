@@ -16,5 +16,17 @@
         {
             return (self.CurrentKeyStates[keyType].IsUp && self.LastKeyStates[keyType].IsDown);
         }
+
+        public static void UpdateVelocityFromDeltaLocation(this AtsSimulationEnvironment self)
+        {
+            var deltaLocation = self.CurrentStates.Location - self.LastStates.Location;
+            var deltaTime = (double)(self.CurrentStates.SimulationTime - self.LastStates.SimulationTime);
+
+            if (deltaTime > 0.0)
+            {
+                var kmph = deltaLocation / deltaTime * 3600.0;
+                self.CurrentStates.SetVelocityFromDeltaLocation((float)(kmph));
+            }
+        }
     }
 }

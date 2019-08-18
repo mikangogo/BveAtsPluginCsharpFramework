@@ -15,7 +15,7 @@ namespace AtsPlugin
         }
 
 
-        private IAtsBehaviour[] Behaviours { get; set; } = null;
+        private IAtsBehaviour[] BehaviourArray { get; set; } = null;
 
         public static AtsSimulationEnvironment Instance { get; } = new AtsSimulationEnvironment();
 
@@ -30,6 +30,7 @@ namespace AtsPlugin
         public AtsKeyStates CurrentKeyStates { get; private set; } = new AtsKeyStates();
         public double DeltaTime => Math.Max(1.0, CurrentStates.SimulationTime - LastStates.SimulationTime);
         public float DeltaTimeF => (float)DeltaTime;
+        public bool WasJustInitialized { get; private set; } = false;
 
         
 
@@ -49,10 +50,10 @@ namespace AtsPlugin
                 behaviourList.Add((IAtsBehaviour)Activator.CreateInstance(type));
             }
 
-            Behaviours = behaviourList.OrderBy(element => (Attribute.GetCustomAttribute(element.GetType(), typeof(AtsBehaviourPriority)) as AtsBehaviourPriority)?.Priority ?? LowestPriority).ToArray();
+            BehaviourArray = behaviourList.OrderBy(element => (Attribute.GetCustomAttribute(element.GetType(), typeof(AtsBehaviourPriority)) as AtsBehaviourPriority)?.Priority ?? LowestPriority).ToArray();
 
 
-            foreach (var behaviour in Behaviours)
+            foreach (var behaviour in BehaviourArray)
             {
                 behaviour.Awake(this);
             }
@@ -60,19 +61,19 @@ namespace AtsPlugin
 
         internal void OnDispose()
         {
-            foreach (var behaviour in Behaviours)
+            foreach (var behaviour in BehaviourArray)
             {
                 behaviour.OnDestroy();
             }
 
-            Behaviours = null;
+            BehaviourArray = null;
         }
 
         internal void OnVehicleSpecPresented(AtsVehicleSpec vehicleSpec)
         {
             ControlHandle = new AtsControlHandle(vehicleSpec);
 
-            foreach (var behaviour in Behaviours)
+            foreach (var behaviour in BehaviourArray)
             {
                 behaviour.OnActivate();
             }
@@ -80,9 +81,11 @@ namespace AtsPlugin
 
         internal void OnInitialize(int initialHandlePosition)
         {
+            WasJustInitialized = true;
+
             var convertedArgument = (AtsInitialHandlePosition)Enum.ToObject(typeof(AtsInitialHandlePosition), initialHandlePosition);
 
-            foreach (var behaviour in Behaviours)
+            foreach (var behaviour in BehaviourArray)
             {
                 behaviour.OnStart(convertedArgument);
             }
@@ -99,7 +102,7 @@ namespace AtsPlugin
                 CurrentStates.SetDoorState(AtsSimulationStates.DoorStateType.Open);
             }
             
-            foreach (var behaviour in Behaviours)
+            foreach (var behaviour in BehaviourArray)
             {
                 behaviour.OnDoorStateChanged(CurrentStates.DoorState);
             }
@@ -123,7 +126,7 @@ namespace AtsPlugin
         {
             var convertedArgument = (AtsHornType)Enum.ToObject(typeof(AtsHornType), hornIndex);
 
-            foreach (var behaviour in Behaviours)
+            foreach (var behaviour in BehaviourArray)
             {
                 behaviour.OnHornBlew(convertedArgument);
             }
@@ -131,7 +134,7 @@ namespace AtsPlugin
 
         internal void OnControlHandleMoved(int position, ControlHandleType controlHandleType)
         {
-            foreach (var behaviour in Behaviours)
+            foreach (var behaviour in BehaviourArray)
             {
                 behaviour.OnControlHandleMoved(position, controlHandleType);
             }
@@ -142,17 +145,17 @@ namespace AtsPlugin
         
         internal void OnSignalChanged(int signalIndex)
         {
-            foreach (var behaviour in Behaviours)
+            foreach (var behaviour in BehaviourArray)
             {
                 behaviour.OnSignalChanged(signalIndex);
             }
         }
 
-        internal void OnBeaconDataRecieved(AtsBeaconData beaconData)
+        internal void OnBeaconDataReceived(AtsBeaconData beaconData)
         {
-            foreach (var behaviour in Behaviours)
+            foreach (var behaviour in BehaviourArray)
             {
-                behaviour.OnBeaconDataRecieved(beaconData);
+                behaviour.OnBeaconDataReceived(beaconData);
             }
         }
 
@@ -162,13 +165,20 @@ namespace AtsPlugin
             SoundOperations.SetSource(soundArray);
 
             LastStates.CopyFrom(CurrentStates);
-            CurrentStates.SetVehicleState(vehicleState);
-            
+            if (WasJustInitialized)
+            {
+                LastStates.SetVehicleState(vehicleState);
+            }
 
+            CurrentStates.SetVehicleState(vehicleState);
+
+            this.UpdateVelocityFromDeltaLocation();
+
+            
             ControlHandle.Update();
 
 
-            foreach (var behaviour in Behaviours)
+            foreach (var behaviour in BehaviourArray)
             {
                 behaviour.Update();
             }
@@ -176,6 +186,8 @@ namespace AtsPlugin
             LastKeyStates.CopyFrom(CurrentKeyStates);
 
             vehicleOperations = ControlHandle.Operation;
+
+            WasJustInitialized = false;
         }
     }
 }

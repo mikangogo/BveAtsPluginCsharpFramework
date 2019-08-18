@@ -12,7 +12,7 @@
         void OnHornBlew(AtsHornType hornType);
         void OnControlHandleMoved(int position, AtsSimulationEnvironment.ControlHandleType controlHandleType);
         void OnSignalChanged(int signalIndex);
-        void OnBeaconDataRecieved(AtsBeaconData beaconData);
+        void OnBeaconDataReceived(AtsBeaconData beaconData);
 
         void Update();
     }

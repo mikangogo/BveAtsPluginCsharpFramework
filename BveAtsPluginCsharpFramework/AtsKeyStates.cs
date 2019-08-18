@@ -49,7 +49,19 @@ namespace AtsPlugin
         }
 
         private KeyState[] KeyStates { get => _keyStates; }
-        private KeyState[] _keyStates = Enumerable.Repeat<KeyState>(new KeyState(), Enum.GetNames(typeof(AtsKey)).Length).ToArray();
+        private KeyState[] _keyStates = null;
+
+
+        public AtsKeyStates()
+        {
+            _keyStates = new KeyState[Enum.GetNames(typeof(AtsKey)).Length];
+
+
+            for (var i = 0; i < _keyStates.Length; ++i)
+            {
+                _keyStates[i] = new KeyState();
+            }
+        }
 
         public KeyState this[AtsKey keyType]
         {

@@ -68,6 +68,8 @@
     <Compile Include="AtsMain.cs" />
     <Compile Include="AtsModule.cs" />
     <Compile Include="AtsNamedIoArray.cs" />
+    <Compile Include="AtsNamedIoArrayExtensions.cs" />
+    <Compile Include="AtsPluginParameters.cs" />
     <Compile Include="AtsSimulationEnvironment.cs" />
     <Compile Include="AtsSimulationEnvironmentExtensions.cs" />
     <Compile Include="AtsSimulationStates.cs" />
