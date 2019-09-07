@@ -17,7 +17,7 @@ namespace AtsPlugin
 
         private IAtsBehaviour[] BehaviourArray { get; set; } = null;
 
-        public static AtsSimulationEnvironment Instance { get; } = new AtsSimulationEnvironment();
+        public static AtsSimulationEnvironment Instance { get; private set; } = new AtsSimulationEnvironment();
 
         public readonly int LowestPriority = 1000000;
         public AtsBus Bus { get; private set; } = new AtsBus();
@@ -28,11 +28,22 @@ namespace AtsPlugin
         public AtsSimulationStates CurrentStates { get; private set; } = new AtsSimulationStates();
         public AtsKeyStates LastKeyStates { get; private set; } = new AtsKeyStates();
         public AtsKeyStates CurrentKeyStates { get; private set; } = new AtsKeyStates();
-        public double DeltaTime => Math.Max(1.0, CurrentStates.SimulationTime - LastStates.SimulationTime);
+        public double MaximumDeltaTime { get; set; } = 1000.0;
+        public double DeltaTime => Math.Min(Math.Max(1.0, CurrentStates.SimulationTime - LastStates.SimulationTime), MaximumDeltaTime);
         public float DeltaTimeF => (float)DeltaTime;
         public bool WasJustInitialized { get; private set; } = false;
+        public AtsPluginParameters PluginParameters { get; } = new AtsPluginParameters();
 
-        
+
+        internal static void CreateInstance()
+        {
+            Instance = new AtsSimulationEnvironment();
+        }
+
+        internal static void DisposeInstance()
+        {
+            Instance = null;
+        }
 
         private AtsSimulationEnvironment()
         {

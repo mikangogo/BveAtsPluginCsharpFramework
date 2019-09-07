@@ -145,6 +145,7 @@ namespace AtsPlugin
             AtsDebug.LogInfo($"Called: {nameof(Load)}()");
 
 
+            AtsSimulationEnvironment.CreateInstance();
             AtsSimulationEnvironment.Instance.OnLoad();
         }
 
@@ -158,6 +159,7 @@ namespace AtsPlugin
 
 
             AtsSimulationEnvironment.Instance.OnDispose();
+            AtsSimulationEnvironment.DisposeInstance();
         }
 
         /// <summary>
