@@ -20,7 +20,7 @@ namespace AtsPlugin
 
                 try
                 {
-                    indexString = AtsPluginParameters.Instance.GetParameterAsString(keyName);
+                    indexString = AtsSimulationEnvironment.Instance.PluginParameters.GetParameterAsString(keyName);
                 }
                 catch (KeyNotFoundException)
                 {
