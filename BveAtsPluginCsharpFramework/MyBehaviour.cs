@@ -12,7 +12,7 @@
 
         }
 
-        public void OnBeaconDataRecieved(AtsBeaconData beaconData)
+        public void OnBeaconDataReceived(AtsBeaconData beaconData)
         {
 
         }
