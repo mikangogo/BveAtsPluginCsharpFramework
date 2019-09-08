@@ -13,7 +13,7 @@ namespace AtsPlugin.MotorNoise
             if (!File.Exists(motorNoisePath))
             {
                 throw new FileNotFoundException(
-                    $"{typeof(AtsMotorNoiseImporter).Name}: The file does not exist: {typeof(AtsMotorNoiseImporter).Name}");
+                    $"{typeof(AtsMotorNoiseImporter).Name}: The file does not exist: {motorNoisePath}");
             }
 
             var motorNoise = ImportMotorNoise(motorNoisePath);
