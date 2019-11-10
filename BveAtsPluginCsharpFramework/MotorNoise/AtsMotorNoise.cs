@@ -1,95 +1,15 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 
 using SlimDX.DirectSound;
-using SlimDX.Multimedia;
 
 using AtsPlugin.Parametrics;
+using AtsPlugin.Audio;
 
 namespace AtsPlugin.MotorNoise
 {
     public class AtsMotorNoise
     {
-        private static Action DisposeActionDelegate { get; set; }
-
-        private static DirectSound DirectSoundDevice { get; set; } = null;
-        private static PrimarySoundBuffer PrimaryBuffer { get; set; } = null;
-        private static SoundBufferDescription PrimaryBufferDesc { get; set; }
-
-
-        public static void Startup()
-        {
-            DirectSoundDevice = new DirectSound();
-
-
-            if (DirectSoundDevice.SetCooperativeLevel(Process.GetCurrentProcess().MainWindowHandle, CooperativeLevel.Priority).IsFailure)
-            {
-                throw new InvalidOperationException("Initializing DirectSound was failed.");
-            }
-
-
-            PrimaryBufferDesc = new SoundBufferDescription
-            {
-                Format = null,
-                Flags = BufferFlags.PrimaryBuffer,
-                SizeInBytes = 0,
-            };
-
-
-            PrimaryBuffer = new PrimarySoundBuffer(DirectSoundDevice, PrimaryBufferDesc);
-            PrimaryBuffer.Play(0, PlayFlags.Looping);
-        }
-
-        public static void Cleanup()
-        {
-            // HACK: `DirectSound.Dispose()` calls Thread.Join() in itself.
-            // Bve doesn't wait the running thread object when disposing the plug-in.
-            // We have to block disposing forcibly.
-            var disposeThread = new System.Threading.Thread(DisposeThread);
-            disposeThread.Start();
-
-
-            var beginTime = DateTime.Now.Millisecond;
-
-            while (disposeThread.ThreadState == System.Threading.ThreadState.Unstarted)
-            {
-                if ((DateTime.Now.Millisecond - beginTime) > 5000)
-                {
-                    // Timed out.
-                    break;
-                }
-            }
-
-
-            beginTime = DateTime.Now.Millisecond;
-
-            while (disposeThread.ThreadState != System.Threading.ThreadState.Stopped)
-            {
-                // Busy loop.
-                // Forcibly waiting.
-
-                if ((DateTime.Now.Millisecond - beginTime) > 5000)
-                {
-                    // Timed out.
-                    break;
-                }
-            }
-        }
-
-        private static void DisposeThread()
-        {
-            DisposeActionDelegate?.Invoke();
-            PrimaryBuffer.Dispose();
-            DirectSoundDevice.Dispose();
-
-
-            DisposeActionDelegate = null;
-            PrimaryBuffer = null;
-            DirectSoundDevice = null;
-        }
-
-
         public class ParameterTables
         {
             public AtsMotorNoiseTable Pitch { get; private set; } = null;
@@ -103,86 +23,16 @@ namespace AtsPlugin.MotorNoise
             }
         }
 
-        public class MotorAudio : IDisposable
+        public class MotorAudio : AtsAudioTrack
         {
-            private byte[] RawAudioStream { get; set; } = null;
-            private SecondarySoundBuffer SecondaryBuffer { get; set; } = null;
-            private SoundBufferDescription SecondaryBufferDesc { get; set; }
-
-            private int MinimumFrequency { get; set; } = 0;
-            private int MaximumFrequency { get; set; } = 0;
-
-            private int DefaultFrequency { get; set; } = 0;
-            private readonly int MinimumVolume = -10000;
-
-            public float Pitch { set; get; }
-            public float Volume { set; get; }
-
-            public MotorAudio(Stream stream)
+            public MotorAudio(Stream stream) : base(stream)
             {
-                using (var audioStream = new WaveStream(stream))
-                {
-                    SecondaryBufferDesc = new SoundBufferDescription
-                    {
-                        Format = audioStream.Format,
-                        Flags = BufferFlags.ControlVolume | BufferFlags.ControlFrequency | BufferFlags.ControlPan | BufferFlags.GetCurrentPosition2,
-                        SizeInBytes = (int)audioStream.Length
-                    };
-
-
-                    RawAudioStream = new byte[SecondaryBufferDesc.SizeInBytes];
-
-                    audioStream.Read(RawAudioStream, 0, (int)audioStream.Length);
-                }
-            }
-            
-            public void SetupSoundBuffer(DirectSound device)
-            {
-                if (SecondaryBuffer != null)
-                {
-                    throw new InvalidOperationException("Already exists SoundBuffer.");
-                }
-
-                SecondaryBuffer = new SecondarySoundBuffer(device, SecondaryBufferDesc);
-                SecondaryBuffer.Write(RawAudioStream, 0, LockFlags.EntireBuffer);
-                SecondaryBuffer.CurrentPlayPosition = 0;
-                SecondaryBuffer.Volume = MinimumVolume;
-
-                MinimumFrequency = device.Capabilities.MinSecondarySampleRate;
-                MaximumFrequency = device.Capabilities.MaxSecondarySampleRate;
-
-                DefaultFrequency = SecondaryBufferDesc.Format.SamplesPerSecond;
+                IsLooped = true;
             }
 
-            public void Update()
+            protected override void OnUpdate()
             {
-                var pitch = Math.Max(Pitch, 0.0f);
-                var volume = Math.Max(Math.Min(Volume, 1.0f), 0.0f);
-
-                SecondaryBuffer.Frequency = Math.Min(Math.Max((int)(DefaultFrequency * pitch), MinimumFrequency), MaximumFrequency);
-
-                var gain = MinimumVolume;
-
-
-                if (volume > 0.001f)
-                {
-                    var attenuation = volume;
-
-
-                    if (attenuation >= 1.0f)
-                    {
-                        attenuation = 1.0f;
-                    }
-
-
-                    gain = (int)(Math.Log10(1.0 / 1024.0 + attenuation / 1.0 * 1023.0 / 1024.0) * 2000.0);
-                }
-
-
-                SecondaryBuffer.Volume = gain;
-
-
-                if (volume > 0.0f)
+                if (Volume > 0.0f)
                 {
                     if ((SecondaryBuffer.Status & BufferStatus.Playing) != 0)
                     {
@@ -191,7 +41,7 @@ namespace AtsPlugin.MotorNoise
 
 
                     SecondaryBuffer.CurrentPlayPosition = 0;
-                    SecondaryBuffer.Play(0, PlayFlags.Looping);
+                    PlayState = PlayingState.Play;
 
 
                     return;
@@ -204,12 +54,7 @@ namespace AtsPlugin.MotorNoise
                 }
 
 
-                SecondaryBuffer.Stop();
-            }
-
-            public void Dispose()
-            {
-                SecondaryBuffer.Dispose();
+                PlayState = PlayingState.Stop;
             }
         }
 
@@ -227,10 +72,6 @@ namespace AtsPlugin.MotorNoise
                 Audio = audio;
             }
 
-            public void SetupAudio(DirectSound device)
-            {
-                Audio.SetupSoundBuffer(device);
-            }
 
             public void Update()
             {
@@ -261,13 +102,6 @@ namespace AtsPlugin.MotorNoise
         public void SetMotorTracks(MotorTrack[] motorTracks)
         {
             MotorTracks = motorTracks;
-
-
-            foreach (var motorTrack in motorTracks)
-            {
-                DisposeActionDelegate += motorTrack.Dispose;
-                motorTrack.SetupAudio(DirectSoundDevice);
-            }
         }
 
         public void Update()

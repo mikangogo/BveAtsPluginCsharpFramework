@@ -73,6 +73,8 @@
     <Compile Include="AtsSimulationEnvironment.cs" />
     <Compile Include="AtsSimulationEnvironmentExtensions.cs" />
     <Compile Include="AtsSimulationStates.cs" />
+    <Compile Include="Audio\AtsAudioManager.cs" />
+    <Compile Include="Audio\AtsAudioTrack.cs" />
     <Compile Include="IAtsBehaviour.cs" />
     <Compile Include="Importing\AtsIniParser.cs" />
     <Compile Include="Importing\AtsParser.cs" />
