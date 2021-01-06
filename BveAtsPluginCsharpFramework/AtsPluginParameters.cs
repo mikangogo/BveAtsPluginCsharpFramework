@@ -9,6 +9,8 @@ namespace AtsPlugin
     {
         public const string PluginParametersFileName = @"PluginParameters.txt";
 
+        public string LoadedPluginParametersPath { get; set; } = string.Empty;
+
         private AtsIni ParametersBody { get; set; }
 
 
@@ -16,7 +18,19 @@ namespace AtsPlugin
         {
             try
             {
-                ParametersBody = AtsParser.ParseIni(PluginParametersFileName, AtsStorage.ReadText);
+                var pathAtCallingModule = Path.Combine(AtsModule.CallingModulePath, PluginParametersFileName);
+
+
+                if (File.Exists(pathAtCallingModule))
+                {
+                    LoadedPluginParametersPath = AtsModule.CallingModulePath;
+                    ParametersBody = AtsParser.ParseIni(Path.Combine(AtsModule.CallingModulePath, PluginParametersFileName), AtsStorage.ReadText);
+                }
+                else
+                {
+                    LoadedPluginParametersPath = AtsModule.ModuleDirectoryPath;
+                    ParametersBody = AtsParser.ParseIni(PluginParametersFileName, AtsStorage.ReadText);
+                }
             }
             catch (FileNotFoundException e)
             {

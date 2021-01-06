@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace AtsPlugin
@@ -145,6 +147,7 @@ namespace AtsPlugin
             AtsDebug.LogInfo($"Called: {nameof(Load)}()");
 
 
+            AtsModule.CallingModulePath = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
             AtsSimulationEnvironment.CreateInstance();
             AtsSimulationEnvironment.Instance.OnLoad();
         }
