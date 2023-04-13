@@ -19,12 +19,18 @@ namespace AtsPlugin
             try
             {
                 var pathAtCallingModule = Path.Combine(AtsModule.CallingModulePath, PluginParametersFileName);
+                var pathAtCwd = Path.Combine(AtsModule.CurrentWorkingDirectory, PluginParametersFileName);
 
 
                 if (File.Exists(pathAtCallingModule))
                 {
                     LoadedPluginParametersPath = AtsModule.CallingModulePath;
                     ParametersBody = AtsParser.ParseIni(Path.Combine(AtsModule.CallingModulePath, PluginParametersFileName), AtsStorage.ReadText);
+                }
+                else if (File.Exists(pathAtCwd))
+                {
+                    LoadedPluginParametersPath = AtsModule.CurrentWorkingDirectory;
+                    ParametersBody = AtsParser.ParseIni(Path.Combine(AtsModule.CurrentWorkingDirectory, PluginParametersFileName), AtsStorage.ReadText);
                 }
                 else
                 {

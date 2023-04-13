@@ -15,5 +15,6 @@ namespace AtsPlugin
         public static string ModuleName => Path.GetFileName(ModulePathWithFileName);
         public static string ModuleDirectoryPath => Path.GetDirectoryName(ModulePathWithFileName);
         public static string CallingModulePath { get; set; }
+        public static string CurrentWorkingDirectory { get; set; }
     }
 }

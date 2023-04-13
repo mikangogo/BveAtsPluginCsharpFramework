@@ -147,6 +147,7 @@ namespace AtsPlugin
             AtsDebug.LogInfo($"Called: {nameof(Load)}()");
 
 
+            AtsModule.CurrentWorkingDirectory = Directory.GetCurrentDirectory();
             AtsModule.CallingModulePath = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
             AtsSimulationEnvironment.CreateInstance();
             AtsSimulationEnvironment.Instance.OnLoad();
